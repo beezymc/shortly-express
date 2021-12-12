@@ -39,8 +39,8 @@ describe('', function() {
     /* TODO: Update user and password if different than on your local machine            */
     /*************************************************************************************/
     db = mysql.createConnection({
-      user: 'student',
-      password: 'student',
+      user: 'root',
+      password: '',
       database: 'shortly'
     });
 
@@ -123,7 +123,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Creation:', function() {
+  describe('Account Creation:', function() {
 
     it('signup creates a new user record', function(done) {
       var options = {
@@ -208,7 +208,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Login:', function() {
+  describe('Account Login:', function() {
 
     beforeEach(function(done) {
       var options = {
@@ -277,7 +277,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions Schema:', function() {
+  describe('Sessions Schema:', function() {
     it('contains a sessions table', function(done) {
       var queryString = 'SELECT * FROM sessions';
       db.query(queryString, function(err, results) {
@@ -325,7 +325,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Express Middleware', function() {
+  describe('Express Middleware', function() {
     var cookieParser = require('../server/middleware/cookieParser.js');
     var createSession = require('../server/middleware/auth.js').createSession;
 
@@ -442,20 +442,19 @@ describe('', function() {
 
         db.query('INSERT INTO users (username) VALUES (?)', username, function(error, results) {
           if (error) { return done(error); }
-          var userId = results.insertId;
-
-          createSession(requestWithoutCookie, response, function() {
+          var userId = results.insertId; // user id 1
+          createSession(requestWithoutCookie, response, function() { // session id 1
             var hash = requestWithoutCookie.session.hash;
-            db.query('UPDATE sessions SET userId = ? WHERE hash = ?', [userId, hash], function(error, result) {
-
+            db.query('UPDATE sessions SET userId = ? WHERE hash = ?', [userId, hash], function(error, result) { // updates session id 1 with user id 1
+              // console.log('result:', result);
               var secondResponse = httpMocks.createResponse();
               var requestWithCookies = httpMocks.createRequest();
               requestWithCookies.cookies.shortlyid = hash;
-
               createSession(requestWithCookies, secondResponse, function() {
                 var session = requestWithCookies.session;
+                console.log('test session:', session);
                 expect(session).to.be.an('object');
-                expect(session.user.username).to.eq(username);
+                expect(session.user.username).to.eq(username); // expecting username: BillZito
                 expect(session.userId).to.eq(userId);
                 done();
               });
@@ -480,7 +479,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions and cookies', function() {
+  describe('Sessions and cookies', function() {
     var requestWithSession;
     var cookieJar;
 

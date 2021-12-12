@@ -35,10 +35,13 @@ class Sessions extends Model {
   get(options) {
     return super.get.call(this, options)
       .then(session => {
+        console.log('session: ', session, session.userId);
         if (!session || !session.userId) {
+          // console.log('session without id');
           return session;
         }
         return Users.get({ id: session.userId }).then(user => {
+          console.log('session with id', user);
           session.user = user;
           return session;
         });
@@ -54,6 +57,9 @@ class Sessions extends Model {
     let data = utils.createRandom32String();
     let hash = utils.createHash(data);
     return super.create.call(this, { hash });
+  }
+  update(hash, userId) {
+    return super.update.call(this, { hash: hash }, { userId: userId} );
   }
 }
 

@@ -1,20 +1,24 @@
 const parseCookies = (req, res, next) => {
-  var cookieList = req.headers.cookie || null;
-  if (cookieList) {
-    let cookies = cookieList.split('; ');
-    let cookieObjects = [];
-    for (let i = 0; i < cookies.length; i++) {
-      let keyValue = cookies[i].split('=');
-      cookieObjects.push({
-        name: keyValue[0],
-        hash: keyValue[1]
-      });
-    }
-    req.cookies = cookieObjects;
+  // check if cookie exists
+  if (!req.headers.cookie) {
+    req.cookies = {};
+    next();
   } else {
-    req.cookies = null;
+    console.log('cookie header:', req.headers.cookie);
+    // access the cookies on an incoming request
+    let cookie = {};
+    let cookieList = req.headers.cookie.split('; ');
+
+    // parse them into an object
+    for (let i = 0; i < cookieList.length; i++) {
+      pair = cookieList[i].split('=');
+      cookie[pair[0]] = pair[1];
+    }
+
+    // assign this object to a cookies property on the request.
+    req.cookies = cookie;
+    next();
   }
-  next();
 };
 
 module.exports = parseCookies;
