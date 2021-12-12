@@ -4,6 +4,7 @@ const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const Auth = require('./middleware/auth');
 const models = require('./models');
+const cookieParser = require('./middleware/cookieParser');
 
 const app = express();
 
@@ -13,8 +14,7 @@ app.use(partials());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-
-
+app.use(cookieParser);
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -107,7 +107,7 @@ app.post('/login', (req, res, next) => {
   var username = req.body.username;
   var password = req.body.password;
   //TODO first step: check if user has a cookie: if so, validate cookie. if user has valid cookie, redirect.
-  // If invalid or no cookie, execute steps below.
+  // If no cookie, execute steps below. If invalid, the cookie should be removed from the user/the session removed from the DB.
   //if the username isn't in the DB, return an error.
   return models.Users.get( {username} )
     .then((user) => {
